@@ -17,6 +17,8 @@ export default function Dashboard() {
   const [jobDescription, setJobDescription] = useState('');
   const [aiResult, setAiResult] = useState(null);
   const [aiLoading, setAiLoading] = useState(false);
+  const [fileUploading, setFileUploading] = useState(false);
+  const fileInputRef = useRef(null);
   const [activeTab, setActiveTab] = useState('overview');
   const [profileName, setProfileName] = useState('');
   const [profileSaving, setProfileSaving] = useState(false);
@@ -76,6 +78,32 @@ export default function Dashboard() {
   function copyToClipboard(text) {
     navigator.clipboard.writeText(text);
     toast('Copied to clipboard!', 'info');
+  }
+
+  async function handleFileUpload(e) {
+    const file = e.target.files[0];
+    if (!file) return;
+    setFileUploading(true);
+    try {
+      if (file.type === 'application/pdf') {
+        const arrayBuffer = await file.arrayBuffer();
+        const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+        let text = '';
+        for (let i = 1; i <= pdf.numPages; i++) {
+          const page = await pdf.getPage(i);
+          const content = await page.getTextContent();
+          text += content.items.map(item => item.str).join(' ') + '\n';
+        }
+        setResumeText(text.trim());
+      } else {
+        const text = await file.text();
+        setResumeText(text.trim());
+      }
+    } catch {
+      setResumeText('');
+      alert('Could not read file. Try a PDF or TXT file.');
+    }
+    setFileUploading(false);
   }
 
   async function handleAIAnalysis(type) {
@@ -318,17 +346,34 @@ export default function Dashboard() {
         <div className="space-y-6">
           <div className="bg-white rounded-xl border border-gray-200 p-6">
             <h2 className="text-lg font-semibold text-gray-800 mb-1">🤖 Resume Analyzer</h2>
-            <p className="text-sm text-gray-500 mb-4">Paste your resume and get AI-powered feedback.</p>
+            <p className="text-sm text-gray-500 mb-4">Upload your resume or paste text to get AI-powered feedback.</p>
+            <input ref={fileInputRef} type="file" accept=".pdf,.txt" className="hidden" onChange={handleFileUpload} />
+            <div
+              onClick={() => fileInputRef.current.click()}
+              className="w-full border-2 border-dashed border-blue-300 rounded-lg p-6 text-center cursor-pointer hover:bg-blue-50 transition-colors mb-3"
+            >
+              {fileUploading ? (
+                <p className="text-blue-500 text-sm font-medium">Reading file…</p>
+              ) : resumeText ? (
+                <p className="text-green-600 text-sm font-medium">✅ Resume loaded — click to replace</p>
+              ) : (
+                <>
+                  <p className="text-2xl mb-1">📄</p>
+                  <p className="text-blue-600 font-medium text-sm">Click to upload resume</p>
+                  <p className="text-gray-400 text-xs mt-1">PDF or TXT supported</p>
+                </>
+              )}
+            </div>
             <textarea
-              rows={6}
+              rows={4}
               value={resumeText}
               onChange={e => setResumeText(e.target.value)}
-              placeholder="Paste your resume text here..."
+              placeholder="Or paste your resume text here…"
               className="w-full border border-gray-300 rounded-lg px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
             />
             <button
               onClick={() => handleAIAnalysis('resume')}
-              disabled={aiLoading || !resumeText.trim()}
+              disabled={aiLoading || fileUploading || !resumeText.trim()}
               className="mt-3 bg-blue-600 hover:bg-blue-700 disabled:opacity-50 text-white font-medium px-6 py-2 rounded-lg transition-colors text-sm"
             >
               {aiLoading ? 'Analyzing…' : 'Analyze Resume'}
