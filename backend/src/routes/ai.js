@@ -39,7 +39,7 @@ Be concise, specific, and encouraging.`,
     res.json({ result: completion.choices[0].message.content });
   } catch (err) {
     console.error('Groq error:', err.message);
-    res.status(500).json({ message: 'AI request failed' });
+    res.status(500).json({ message: `AI request failed: ${err.message}` });
   }
 });
 
