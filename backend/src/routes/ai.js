@@ -13,6 +13,8 @@ router.post('/analyze-resume', auth, async (req, res) => {
       return res.status(400).json({ message: 'resumeText is required' });
     }
 
+    const truncated = resumeText.slice(0, 4000);
+
     const completion = await groq.chat.completions.create({
       model: 'llama3-8b-8192',
       messages: [
@@ -28,7 +30,7 @@ Analyze the provided resume and give structured, actionable feedback covering:
 
 Be concise, specific, and encouraging.`,
         },
-        { role: 'user', content: `Please analyze this resume:\n\n${resumeText}` },
+        { role: 'user', content: `Please analyze this resume:\n\n${truncated}` },
       ],
       max_tokens: 800,
       temperature: 0.7,
@@ -65,7 +67,7 @@ Do not use placeholders — write it as a complete, ready-to-send letter.`,
         },
         {
           role: 'user',
-          content: `Resume:\n${resumeText}\n\nJob Description:\n${jobDescription}`,
+          content: `Resume:\n${resumeText.slice(0, 3000)}\n\nJob Description:\n${jobDescription.slice(0, 1000)}`,
         },
       ],
       max_tokens: 700,
