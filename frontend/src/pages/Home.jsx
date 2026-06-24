@@ -43,11 +43,36 @@ function StatCard({ end, suffix, label, animate }) {
   );
 }
 
+const SUGGESTIONS = [
+  'React Developer', 'Node.js Developer', 'Full Stack Developer',
+  'Data Scientist', 'Machine Learning Engineer', 'Python Developer',
+  'UI Designer', 'UX Designer', 'Product Manager',
+  'DevOps Engineer', 'Cloud Architect', 'Android Developer',
+  'iOS Developer', 'Data Analyst', 'Marketing Manager',
+  'Finance Analyst', 'Backend Developer', 'Frontend Developer',
+];
+
 export default function Home() {
   const navigate = useNavigate();
   const [search, setSearch] = useState('');
+  const [showSuggestions, setShowSuggestions] = useState(false);
   const [statsVisible, setStatsVisible] = useState(false);
   const statsRef = useRef(null);
+  const searchRef = useRef(null);
+
+  const filtered = search.trim()
+    ? SUGGESTIONS.filter(s => s.toLowerCase().includes(search.toLowerCase()))
+    : SUGGESTIONS.slice(0, 8);
+
+  useEffect(() => {
+    function handleClick(e) {
+      if (searchRef.current && !searchRef.current.contains(e.target)) {
+        setShowSuggestions(false);
+      }
+    }
+    document.addEventListener('mousedown', handleClick);
+    return () => document.removeEventListener('mousedown', handleClick);
+  }, []);
 
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -80,13 +105,30 @@ export default function Home() {
           </p>
 
           {/* Search bar */}
-          <form onSubmit={handleSearch} className="flex flex-col sm:flex-row gap-3 max-w-2xl mx-auto mb-10">
+          <form onSubmit={handleSearch} className="flex flex-col sm:flex-row gap-3 max-w-2xl mx-auto mb-10 relative" ref={searchRef}>
+            <div className="flex-1 relative">
             <input
               type="text"
               value={search}
-              onChange={e => setSearch(e.target.value)}
+              onChange={e => { setSearch(e.target.value); setShowSuggestions(true); }}
+              onFocus={() => setShowSuggestions(true)}
               placeholder="Job title, skill, or company..."
-              className="flex-1 px-5 py-3.5 rounded-xl text-gray-800 text-base focus:outline-none focus:ring-2 focus:ring-yellow-300 shadow-lg"
+              className="w-full px-5 py-3.5 rounded-xl text-gray-800 text-base focus:outline-none focus:ring-2 focus:ring-yellow-300 shadow-lg"
+            />
+            {showSuggestions && filtered.length > 0 && (
+              <ul className="absolute top-full left-0 right-0 mt-1 bg-white rounded-xl shadow-xl z-50 overflow-hidden text-left">
+                {filtered.map(s => (
+                  <li
+                    key={s}
+                    onMouseDown={() => { setSearch(s); setShowSuggestions(false); navigate(`/jobs?q=${encodeURIComponent(s)}`); }}
+                    className="px-5 py-3 text-gray-700 hover:bg-blue-50 hover:text-blue-700 cursor-pointer text-sm border-b border-gray-100 last:border-0"
+                  >
+                    🔍 {s}
+                  </li>
+                ))}
+              </ul>
+            )}
+            </div>
             />
             <button
               type="submit"
