@@ -129,7 +129,6 @@ export default function Home() {
               </ul>
             )}
             </div>
-            />
             <button
               type="submit"
               className="bg-yellow-400 hover:bg-yellow-300 text-gray-900 font-bold px-8 py-3.5 rounded-xl transition-colors shadow-lg whitespace-nowrap"
