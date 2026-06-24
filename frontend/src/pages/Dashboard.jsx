@@ -350,17 +350,17 @@ export default function Dashboard() {
             <input ref={fileInputRef} type="file" accept=".pdf,.txt" className="hidden" onChange={handleFileUpload} />
             <div
               onClick={() => fileInputRef.current.click()}
-              className="w-full border-2 border-dashed border-blue-300 rounded-lg p-6 text-center cursor-pointer hover:bg-blue-50 transition-colors mb-3"
+              className="w-full border-2 border-dashed border-blue-800 rounded-lg p-6 text-center cursor-pointer hover:bg-blue-50 transition-colors mb-3"
             >
               {fileUploading ? (
-                <p className="text-blue-500 text-sm font-medium">Reading file…</p>
+                <p className="text-blue-900 text-sm font-medium">Reading file…</p>
               ) : resumeText ? (
                 <p className="text-green-600 text-sm font-medium">✅ Resume loaded — click to replace</p>
               ) : (
                 <>
                   <p className="text-2xl mb-1">📄</p>
-                  <p className="text-blue-600 font-medium text-sm">Click to upload resume</p>
-                  <p className="text-gray-400 text-xs mt-1">PDF or TXT supported</p>
+                  <p className="text-blue-900 font-medium text-sm">Click to upload resume</p>
+                  <p className="text-gray-500 text-xs mt-1">PDF or TXT supported</p>
                 </>
               )}
             </div>
