@@ -6,7 +6,7 @@ export default function Footer() {
       <div className="max-w-6xl mx-auto px-4">
         <div className="grid grid-cols-2 md:grid-cols-4 gap-8 mb-10">
           <div className="col-span-2 md:col-span-1">
-            <Link to="/" className="text-white text-xl font-bold">JobPortal AI</Link>
+            <Link to="/" className="text-xl font-bold"><span className="text-blue-400">Hire</span><span className="text-yellow-400">AI</span></Link>
             <p className="mt-3 text-sm leading-relaxed">
               AI-powered job search platform helping thousands of professionals find their dream roles.
             </p>
@@ -36,7 +36,7 @@ export default function Footer() {
           </div>
         </div>
         <div className="border-t border-gray-800 pt-6 flex flex-col sm:flex-row items-center justify-between gap-4 text-sm">
-          <p>© 2024 JobPortal AI. All rights reserved.</p>
+          <p>© 2026 HireAI. All rights reserved.</p>
           <div className="flex gap-5">
             {['🐦 Twitter', '💼 LinkedIn', '🐙 GitHub'].map(s => (
               <span key={s} className="cursor-pointer hover:text-white transition-colors">{s}</span>
