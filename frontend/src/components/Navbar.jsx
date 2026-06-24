@@ -16,7 +16,7 @@ export default function Navbar() {
   }
 
   return (
-    <nav className="bg-blue-900 shadow-md relative z-50">
+    <nav className="bg-[#0a1628] shadow-md relative z-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
           <Link to="/" className="flex items-center gap-2 text-xl font-bold">
@@ -56,7 +56,7 @@ export default function Navbar() {
 
       {/* Mobile dropdown */}
       {menuOpen && (
-        <div className="md:hidden bg-blue-800 border-t border-blue-700 px-4 py-3 flex flex-col gap-3">
+        <div className="md:hidden bg-[#0d1f3c] border-t border-[#1a3a5c] px-4 py-3 flex flex-col gap-3">
           <Link to="/jobs" onClick={() => setMenuOpen(false)} className="text-white font-medium py-2">Jobs</Link>
           {token ? (
             <>
