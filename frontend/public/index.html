@@ -5,27 +5,52 @@
     <link rel="icon" href="%PUBLIC_URL%/logo.svg" type="image/svg+xml" />
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
     <meta name="theme-color" content="#2563eb" />
-    <meta name="description" content="HireAI - Find Your Dream Job Powered by AI" />
+
+    <!-- SEO -->
+    <title>HireAI - AI-Powered Job Portal | Find Your Dream Job</title>
+    <meta name="description" content="HireAI is an AI-powered job portal. Find jobs, analyze your resume with AI, generate cover letters, prep for interviews, and track live job openings across India and worldwide." />
+    <meta name="keywords" content="job portal, find jobs, AI resume analyzer, cover letter generator, interview prep, live jobs, job search India, hire, HireAI" />
+    <meta name="author" content="HireAI" />
+    <link rel="canonical" href="https://ai-powered-job-portal-two.vercel.app/" />
+    <meta name="robots" content="index, follow" />
+
+    <!-- Open Graph (for sharing on WhatsApp, LinkedIn etc) -->
+    <meta property="og:title" content="HireAI - AI-Powered Job Portal" />
+    <meta property="og:description" content="Find jobs, analyze your resume with AI, generate cover letters, and prep for interviews. Live job openings from top companies." />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://ai-powered-job-portal-two.vercel.app/" />
+    <meta property="og:image" content="https://ai-powered-job-portal-two.vercel.app/logo512.png" />
+    <meta property="og:site_name" content="HireAI" />
+
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="HireAI - AI-Powered Job Portal" />
+    <meta name="twitter:description" content="Find jobs, AI resume analysis, cover letter generator, interview prep and live job openings." />
+    <meta name="twitter:image" content="https://ai-powered-job-portal-two.vercel.app/logo512.png" />
+
+    <!-- PWA -->
     <meta name="mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="default" />
     <meta name="apple-mobile-web-app-title" content="HireAI" />
     <link rel="apple-touch-icon" href="%PUBLIC_URL%/logo192.png" />
-    <!--
-      manifest.json provides metadata used when your web app is installed on a
-      user's mobile device or desktop. See https://developers.google.com/web/fundamentals/web-app-manifest/
-    -->
     <link rel="manifest" href="%PUBLIC_URL%/manifest.json" />
-    <!--
-      Notice the use of %PUBLIC_URL% in the tags above.
-      It will be replaced with the URL of the `public` folder during the build.
-      Only files inside the `public` folder can be referenced from the HTML.
 
-      Unlike "/favicon.ico" or "favicon.ico", "%PUBLIC_URL%/favicon.ico" will
-      work correctly both with client-side routing and a non-root public URL.
-      Learn how to configure a non-root public URL by running `npm run build`.
-    -->
-    <title>HireAI - Find Your Dream Job</title>
+    <!-- Structured Data (JSON-LD) for Google -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebSite",
+      "name": "HireAI",
+      "url": "https://ai-powered-job-portal-two.vercel.app/",
+      "description": "AI-powered job portal to find jobs, analyze resumes, generate cover letters and prep for interviews",
+      "potentialAction": {
+        "@type": "SearchAction",
+        "target": "https://ai-powered-job-portal-two.vercel.app/jobs?search={search_term_string}",
+        "query-input": "required name=search_term_string"
+      }
+    }
+    </script>
   </head>
   <body>
     <noscript>You need to enable JavaScript to run this app.</noscript>
