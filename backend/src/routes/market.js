@@ -1,4 +1,5 @@
 const express = require('express');
+const axios = require('axios');
 const router = express.Router();
 
 // GET /api/market/jobs?query=developer&location=india
@@ -6,16 +7,18 @@ router.get('/jobs', async (req, res) => {
   try {
     const { query = 'developer', location = 'india', page = '1' } = req.query;
 
-    const url = `https://jsearch.p.rapidapi.com/search?query=${encodeURIComponent(query + ' in ' + location)}&page=${page}&num_pages=1&date_posted=today`;
-
-    const response = await fetch(url, {
+    const { data } = await axios.get('https://jsearch.p.rapidapi.com/search', {
+      params: {
+        query: `${query} in ${location}`,
+        page,
+        num_pages: '1',
+        date_posted: 'week',
+      },
       headers: {
         'x-rapidapi-host': 'jsearch.p.rapidapi.com',
         'x-rapidapi-key': process.env.JSEARCH_API_KEY,
       },
     });
-
-    const data = await response.json();
 
     if (!data.data) return res.json({ jobs: [] });
 
