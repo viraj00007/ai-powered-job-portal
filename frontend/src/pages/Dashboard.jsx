@@ -22,6 +22,9 @@ export default function Dashboard() {
   const [activeTab, setActiveTab] = useState('overview');
   const [profileName, setProfileName] = useState('');
   const [profileSaving, setProfileSaving] = useState(false);
+  const [matchResult, setMatchResult] = useState(null);
+  const [matchLoading, setMatchLoading] = useState(false);
+  const [matchJobDesc, setMatchJobDesc] = useState('');
 
   const token = localStorage.getItem('token');
   const headers = { Authorization: `Bearer ${token}` };
@@ -121,6 +124,19 @@ export default function Dashboard() {
     }
   }
 
+  async function handleMatchScore() {
+    setMatchLoading(true);
+    setMatchResult(null);
+    try {
+      const res = await axios.post(`${API}/api/ai/match-score`, { resumeText, jobDescription: matchJobDesc }, { headers });
+      setMatchResult(res.data);
+    } catch (err) {
+      toast(err.response?.data?.message || 'AI request failed.', 'error');
+    } finally {
+      setMatchLoading(false);
+    }
+  }
+
   if (!user) {
     return (
       <div className="flex justify-center py-32">
@@ -198,30 +214,47 @@ export default function Dashboard() {
         ))}
       </div>
 
-      {/* Jobseeker: Applications tab */}
+      {/* Jobseeker: Applications Kanban */}
       {activeTab === 'overview' && (
-        <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
-          <div className="p-6 border-b border-gray-100">
-            <h2 className="text-lg font-semibold text-gray-800">My Applications</h2>
-          </div>
+        <div>
+          <h2 className="text-lg font-semibold text-gray-800 mb-4">My Applications</h2>
           {applications.length === 0 ? (
-            <div className="text-center py-16 text-gray-400">
+            <div className="text-center py-16 text-gray-400 bg-white rounded-xl border border-gray-200">
               <p className="text-4xl mb-3">📋</p>
               <p>No applications yet. <a href="/jobs" className="text-blue-600 hover:underline">Browse jobs</a> to get started.</p>
             </div>
           ) : (
-            <div className="divide-y divide-gray-100">
-              {applications.map(app => (
-                <div key={app._id} className="flex items-center justify-between p-5">
-                  <div>
-                    <p className="font-medium text-gray-800">{app.job?.title}</p>
-                    <p className="text-sm text-gray-500">{app.job?.company} · {app.job?.location}</p>
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
+              {[
+                { key: 'pending', label: 'Applied', emoji: '📤', bg: 'bg-yellow-50', border: 'border-yellow-200', text: 'text-yellow-700' },
+                { key: 'reviewed', label: 'Reviewed', emoji: '👀', bg: 'bg-blue-50', border: 'border-blue-200', text: 'text-blue-700' },
+                { key: 'interview', label: 'Interview', emoji: '🎤', bg: 'bg-purple-50', border: 'border-purple-200', text: 'text-purple-700' },
+                { key: 'offer', label: 'Offer', emoji: '🎉', bg: 'bg-green-50', border: 'border-green-200', text: 'text-green-700' },
+                { key: 'rejected', label: 'Rejected', emoji: '❌', bg: 'bg-red-50', border: 'border-red-200', text: 'text-red-700' },
+              ].map(col => {
+                const colApps = applications.filter(a => a.status === col.key);
+                return (
+                  <div key={col.key} className={`${col.bg} border-2 ${col.border} rounded-xl p-3 min-h-32`}>
+                    <div className={`flex items-center justify-between mb-3`}>
+                      <span className={`text-xs font-bold uppercase tracking-wide ${col.text}`}>{col.emoji} {col.label}</span>
+                      <span className="bg-white rounded-full w-5 h-5 flex items-center justify-center text-xs font-bold text-gray-600 shadow-sm">
+                        {colApps.length}
+                      </span>
+                    </div>
+                    {colApps.length === 0 ? (
+                      <p className="text-xs text-gray-400 text-center py-4">—</p>
+                    ) : (
+                      colApps.map(app => (
+                        <div key={app._id} className="bg-white rounded-lg p-2.5 mb-2 shadow-sm border border-gray-100">
+                          <p className="text-xs font-semibold text-gray-800 truncate">{app.job?.title}</p>
+                          <p className="text-xs text-gray-500 truncate">{app.job?.company}</p>
+                          <p className="text-xs text-gray-400 mt-0.5">{app.job?.location}</p>
+                        </div>
+                      ))
+                    )}
                   </div>
-                  <span className={`px-3 py-1 rounded-full text-xs font-medium capitalize ${statusColor(app.status)}`}>
-                    {app.status}
-                  </span>
-                </div>
-              ))}
+                );
+              })}
             </div>
           )}
         </div>
@@ -404,6 +437,71 @@ export default function Dashboard() {
             >
               {aiLoading ? 'Generating…' : 'Generate Cover Letter'}
             </button>
+          </div>
+
+          {/* Job Match Score */}
+          <div className="bg-white rounded-xl border border-gray-200 p-6">
+            <h2 className="text-lg font-semibold text-gray-800 mb-1">🎯 Job Match Score</h2>
+            <p className="text-sm text-gray-500 mb-4">Upload your resume + paste a job description — AI calculates your match %.</p>
+            <textarea
+              rows={3}
+              value={resumeText}
+              onChange={e => setResumeText(e.target.value)}
+              placeholder="Your resume text (upload above or paste here)..."
+              className="w-full border border-gray-300 rounded-lg px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-green-500 resize-none mb-3"
+            />
+            <textarea
+              rows={3}
+              value={matchJobDesc}
+              onChange={e => setMatchJobDesc(e.target.value)}
+              placeholder="Paste the job description you want to match against..."
+              className="w-full border border-gray-300 rounded-lg px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-green-500 resize-none"
+            />
+            <button
+              onClick={handleMatchScore}
+              disabled={matchLoading || !resumeText.trim() || !matchJobDesc.trim()}
+              className="mt-3 bg-green-600 hover:bg-green-700 disabled:opacity-50 text-white font-medium px-6 py-2 rounded-lg transition-colors text-sm"
+            >
+              {matchLoading ? 'Analyzing…' : 'Check Match Score'}
+            </button>
+            {matchResult && (
+              <div className="mt-4 bg-gray-50 rounded-xl border border-gray-200 p-5">
+                <div className="flex items-center gap-4 mb-4">
+                  <div className={`w-20 h-20 rounded-full flex flex-col items-center justify-center border-4 ${matchResult.score >= 70 ? 'border-green-400 text-green-600' : matchResult.score >= 50 ? 'border-yellow-400 text-yellow-600' : 'border-red-400 text-red-600'}`}>
+                    <span className="text-2xl font-bold">{matchResult.score}</span>
+                    <span className="text-xs">/ 100</span>
+                  </div>
+                  <div>
+                    <p className="font-semibold text-gray-800">Match Score</p>
+                    <p className="text-sm text-gray-500">{matchResult.summary}</p>
+                  </div>
+                </div>
+                {matchResult.matched_skills?.length > 0 && (
+                  <div className="mb-3">
+                    <p className="text-xs font-semibold text-green-700 mb-1.5">Matched Skills</p>
+                    <div className="flex flex-wrap gap-1.5">
+                      {matchResult.matched_skills.map(s => <span key={s} className="text-xs bg-green-100 text-green-700 px-2.5 py-1 rounded-full">{s}</span>)}
+                    </div>
+                  </div>
+                )}
+                {matchResult.missing_skills?.length > 0 && (
+                  <div className="mb-3">
+                    <p className="text-xs font-semibold text-red-700 mb-1.5">Missing Skills</p>
+                    <div className="flex flex-wrap gap-1.5">
+                      {matchResult.missing_skills.map(s => <span key={s} className="text-xs bg-red-100 text-red-700 px-2.5 py-1 rounded-full">{s}</span>)}
+                    </div>
+                  </div>
+                )}
+                {matchResult.tips?.length > 0 && (
+                  <div>
+                    <p className="text-xs font-semibold text-gray-700 mb-1.5">Tips to Improve</p>
+                    <ul className="space-y-1">
+                      {matchResult.tips.map((t, i) => <li key={i} className="text-xs text-gray-600 flex gap-1.5"><span>•</span>{t}</li>)}
+                    </ul>
+                  </div>
+                )}
+              </div>
+            )}
           </div>
 
           {aiResult && (

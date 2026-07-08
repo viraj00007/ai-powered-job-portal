@@ -11,6 +11,7 @@ import JobDetail from './pages/JobDetail';
 import Dashboard from './pages/Dashboard';
 import PostJob from './pages/PostJob';
 import LiveJobs from './pages/LiveJobs';
+import InterviewPrep from './pages/InterviewPrep';
 import NotFound from './pages/NotFound';
 
 function ScrollToTop() {
@@ -36,6 +37,7 @@ function App() {
               <Route path="/dashboard" element={<Dashboard />} />
               <Route path="/post-job" element={<PostJob />} />
               <Route path="/live-jobs" element={<LiveJobs />} />
+              <Route path="/interview-prep" element={<InterviewPrep />} />
               <Route path="*" element={<NotFound />} />
             </Routes>
           </main>

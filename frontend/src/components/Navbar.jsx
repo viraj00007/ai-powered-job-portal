@@ -32,6 +32,7 @@ export default function Navbar() {
             <Link to="/live-jobs" className="text-red-500 hover:text-red-600 font-medium transition-colors flex items-center gap-1">
               <span className="w-2 h-2 bg-red-500 rounded-full animate-pulse inline-block"></span>Live
             </Link>
+            <Link to="/interview-prep" className="text-purple-600 hover:text-purple-700 font-medium transition-colors">AI Prep</Link>
             {token ? (
               <>
                 <Link to="/post-job" className="text-gray-600 hover:text-blue-600 font-medium transition-colors">Post a Job</Link>
@@ -64,6 +65,7 @@ export default function Navbar() {
           <Link to="/live-jobs" onClick={() => setMenuOpen(false)} className="text-red-500 font-medium py-2 flex items-center gap-2">
             <span className="w-2 h-2 bg-red-500 rounded-full animate-pulse inline-block"></span>Live Jobs
           </Link>
+          <Link to="/interview-prep" onClick={() => setMenuOpen(false)} className="text-purple-600 font-medium py-2">AI Interview Prep</Link>
           {token ? (
             <>
               <Link to="/post-job" onClick={() => setMenuOpen(false)} className="text-gray-700 font-medium py-2">Post a Job</Link>

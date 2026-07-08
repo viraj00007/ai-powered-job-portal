@@ -81,4 +81,70 @@ Do not use placeholders — write it as a complete, ready-to-send letter.`,
   }
 });
 
+// POST /api/ai/interview-prep
+router.post('/interview-prep', auth, async (req, res) => {
+  try {
+    const { jobDescription } = req.body;
+    if (!jobDescription?.trim()) return res.status(400).json({ message: 'jobDescription is required' });
+
+    const completion = await groq.chat.completions.create({
+      model: 'llama-3.1-8b-instant',
+      messages: [
+        {
+          role: 'system',
+          content: 'You are an expert interview coach. Return ONLY valid JSON with no markdown, no code blocks. Format: {"questions":[{"question":"...","answer":"..."}]}',
+        },
+        {
+          role: 'user',
+          content: `Job Description:\n${jobDescription.slice(0, 2000)}\n\nGenerate exactly 8 interview questions with ideal answers. Include 2 behavioral, 2 technical, 2 situational, 2 culture-fit. Each answer 3-4 sentences.`,
+        },
+      ],
+      max_tokens: 1500,
+      temperature: 0.7,
+    });
+
+    const text = completion.choices[0].message.content;
+    const jsonMatch = text.match(/\{[\s\S]*\}/);
+    const parsed = JSON.parse(jsonMatch ? jsonMatch[0] : text);
+    res.json(parsed);
+  } catch (err) {
+    console.error('Interview prep error:', err.message);
+    res.status(500).json({ message: `AI request failed: ${err.message}` });
+  }
+});
+
+// POST /api/ai/match-score
+router.post('/match-score', auth, async (req, res) => {
+  try {
+    const { resumeText, jobDescription } = req.body;
+    if (!resumeText?.trim() || !jobDescription?.trim()) {
+      return res.status(400).json({ message: 'resumeText and jobDescription are required' });
+    }
+
+    const completion = await groq.chat.completions.create({
+      model: 'llama-3.1-8b-instant',
+      messages: [
+        {
+          role: 'system',
+          content: 'You are an expert ATS system. Return ONLY valid JSON with no markdown. Format: {"score":75,"matched_skills":["React"],"missing_skills":["Docker"],"strengths":["point1"],"tips":["tip1"],"summary":"One sentence summary."}',
+        },
+        {
+          role: 'user',
+          content: `Analyze resume vs job description. Give match score 0-100.\n\nResume:\n${resumeText.slice(0, 2000)}\n\nJob Description:\n${jobDescription.slice(0, 1000)}`,
+        },
+      ],
+      max_tokens: 600,
+      temperature: 0.5,
+    });
+
+    const text = completion.choices[0].message.content;
+    const jsonMatch = text.match(/\{[\s\S]*\}/);
+    const parsed = JSON.parse(jsonMatch ? jsonMatch[0] : text);
+    res.json(parsed);
+  } catch (err) {
+    console.error('Match score error:', err.message);
+    res.status(500).json({ message: `AI request failed: ${err.message}` });
+  }
+});
+
 module.exports = router;
