@@ -1,0 +1,44 @@
+const express = require('express');
+const router = express.Router();
+
+// GET /api/market/jobs?query=developer&location=india
+router.get('/jobs', async (req, res) => {
+  try {
+    const { query = 'developer', location = 'india', page = '1' } = req.query;
+
+    const url = `https://jsearch.p.rapidapi.com/search?query=${encodeURIComponent(query + ' in ' + location)}&page=${page}&num_pages=1&date_posted=today`;
+
+    const response = await fetch(url, {
+      headers: {
+        'x-rapidapi-host': 'jsearch.p.rapidapi.com',
+        'x-rapidapi-key': process.env.JSEARCH_API_KEY,
+      },
+    });
+
+    const data = await response.json();
+
+    if (!data.data) return res.json({ jobs: [] });
+
+    const jobs = data.data.map(job => ({
+      id: job.job_id,
+      title: job.job_title,
+      company: job.employer_name,
+      location: job.job_city ? `${job.job_city}, ${job.job_country}` : job.job_country,
+      type: job.job_employment_type,
+      salary: job.job_min_salary
+        ? `$${job.job_min_salary}–$${job.job_max_salary}`
+        : 'Not disclosed',
+      description: job.job_description?.slice(0, 300) + '...',
+      applyLink: job.job_apply_link,
+      logo: job.employer_logo,
+      posted: job.job_posted_at_datetime_utc,
+    }));
+
+    res.json({ jobs });
+  } catch (err) {
+    console.error('JSearch error:', err.message);
+    res.status(500).json({ jobs: [] });
+  }
+});
+
+module.exports = router;

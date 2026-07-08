@@ -7,6 +7,7 @@ const authRoutes        = require('./routes/auth');
 const jobRoutes         = require('./routes/jobs');
 const applicationRoutes = require('./routes/applications');
 const aiRoutes          = require('./routes/ai');
+const marketRoutes      = require('./routes/market');
 
 const app = express();
 
@@ -21,6 +22,7 @@ app.use('/api/auth',         authRoutes);
 app.use('/api/jobs',         jobRoutes);
 app.use('/api/applications', applicationRoutes);
 app.use('/api/ai',           aiRoutes);
+app.use('/api/market',       marketRoutes);
 
 app.get('/health', (_, res) => res.json({ status: 'ok' }));
 
