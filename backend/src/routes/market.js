@@ -40,7 +40,8 @@ router.get('/jobs', async (req, res) => {
     res.json({ jobs });
   } catch (err) {
     console.error('JSearch error:', err.message);
-    res.status(500).json({ jobs: [] });
+    console.error('JSearch full error:', err.response?.data || err.stack);
+    res.status(200).json({ jobs: [], error: err.message });
   }
 });
 
